@@ -1,0 +1,48 @@
+1、字符识别模块接口：
+Train.java
+OutServlet.java
+描述：Tess4j是一个Google支持的开源的OCR图文识别开源项目，我只测试了中文、英文、数字的识别情况，在图片质量较好的情况下，识别率很高。利用OutServlet.java处理业务逻辑，并把识别的结果request.setAttribute("message", iMessage);iMessage放到键message中，然后再upload-message.jsp页面显示结果。
+
+
+
+2、文件上传模块接口：
+IOUtils.java
+UploadServlet.java
+描述：通过upload.jsp页面调用UploadServlet.java，将文件上传到服务器，然后利用request.setAttribute("File",f);把文件对象放到键"File"中，转发给OutServlet.java处理。
+
+
+3、转JSON模块接口：
+ToJson.java
+描述：识别出字符的位置，然后划分为行，再把处理好后的字符串转为JSON对象。
+
+
+4、灰度灰和二值化接口：
+ToChangGray.java（灰度化）
+
+AbstractBufferedImageOp.java（二值化）
+BinaryFilter.java
+ToChangeBinary.java
+描述：灰度化：
+几种灰度化的方法
+     1、分量法：使用RGB三个分量中的一个作为灰度图的灰度值。
+     2、最值法：使用RGB三个分量中最大值或最小值作为灰度图的灰度值
+     3、均值法：使用RGB三个分量的平均值作为灰度图的灰度值。
+     4、加权法：由于人眼颜色敏感度不同，按下一定的权值对RGB三分量进行加权平均能得到较合理的灰度图像。一般情况按照：
+     Y = 0.30R + 0.59G + 0.11B。
+     
+     我采用的是第四种方法。采用循环的方法去处理像素，要是图片比较大，耗时会比较长。
+
+
+二值化:
+使用的二值化方法：
+     近似一维Means方法寻找二值化阈值，该方法的大致步骤如下：
+     1、一个初始化阈值T，可以自己设置或者根据随机方法生成。
+     2、根据像素值P(x,y)与阈值T的比较结果，将其分为对象像素集合G1与背景像素集合G2。
+     3、计算G1和G2的像素平均值M1、M2。
+     4、得到新的阈值T’ = (M1 + M2)/2。
+     5、比较T'与T是否相等，如果不相等，则令T=T',重复2～5步。
+     6、最终得到的T值作为新的阈值，像素大于T则为白色，反之则为黑色。
+  
+    测试了一下，只有在图片光照均匀的情况下效果较好，要是手机拍的图片光照不均匀，比如说图片的文字部分光照不足有阴影
+    ，二值化的效果就会差很多，所以需要不断改进。
+
